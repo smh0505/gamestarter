@@ -2,19 +2,27 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod entities;
+mod error;
+mod game;
 mod migration;
 
 use core::panic;
 use migration::Migrator;
 use sea_orm::{Database, DatabaseConnection, DbErr};
 use sea_orm_migration::MigratorTrait;
-use std::{env, fs};
+use serde::{Deserialize, Serialize};
 use tauri::{async_runtime::block_on, Manager};
 use window_shadows::set_shadow;
 
 #[derive(Clone)]
 struct AppState {
     conn: DatabaseConnection,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+struct Response {
+    kind: String,
+    message: String,
 }
 
 fn main() {
@@ -30,9 +38,9 @@ fn main() {
             Ok(())
         })
         .manage(state)
+        .invoke_handler(tauri::generate_handler![game::add_game, game::list_games])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
-    //.invoke_handler(tauri::generate_handler![greet])
 }
 
 async fn run() -> Result<DatabaseConnection, DbErr> {

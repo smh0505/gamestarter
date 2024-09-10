@@ -30,12 +30,16 @@ impl MigrationTrait for Migration {
                     .foreign_key(
                         ForeignKey::create()
                             .from(GameTag::Table, GameTag::GameId)
-                            .to(Game::Table, Game::Id),
+                            .to(Game::Table, Game::Id)
+                            .on_update(ForeignKeyAction::Cascade)
+                            .on_delete(ForeignKeyAction::Cascade),
                     )
                     .foreign_key(
                         ForeignKey::create()
                             .from(GameTag::Table, GameTag::TagId)
-                            .to(Tag::Table, Tag::Id),
+                            .to(Tag::Table, Tag::Id)
+                            .on_update(ForeignKeyAction::Cascade)
+                            .on_delete(ForeignKeyAction::Cascade),
                     )
                     .to_owned(),
             )

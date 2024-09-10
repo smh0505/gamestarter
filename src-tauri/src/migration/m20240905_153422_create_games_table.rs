@@ -27,7 +27,8 @@ impl MigrationTrait for Migration {
                         ForeignKey::create()
                             .from(Game::Table, Game::Developer)
                             .to(Developer::Table, Developer::Id)
-                            .on_update(ForeignKeyAction::Cascade),
+                            .on_update(ForeignKeyAction::Cascade)
+                            .on_delete(ForeignKeyAction::SetNull),
                     )
                     .to_owned(),
             )
