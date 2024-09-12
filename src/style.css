@@ -1,13 +1,3 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Titlebar.vue */
-
-#titlebar {
-  @apply navbar bg-base-100 absolute shadow-lg shadow-base-300;
-}
-
-#titlebar-hover {
-  @apply absolute w-full h-8;
-}
