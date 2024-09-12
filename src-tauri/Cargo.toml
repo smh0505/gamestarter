@@ -31,6 +31,7 @@ sea-orm = { version = "1.0.1", features = [
     "macros",
 ] }
 sea-orm-migration = "1.0.1"
+chrono = "0.4.38"
 
 [features]
 # This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!

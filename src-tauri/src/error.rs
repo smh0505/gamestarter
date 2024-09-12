@@ -25,3 +25,21 @@ impl From<sea_orm::DbErr> for BackendError {
         }
     }
 }
+
+impl From<tauri::Error> for BackendError {
+    fn from(value: tauri::Error) -> Self {
+        Self {
+            kind: String::from("tauri::Error"),
+            message: value.to_string(),
+        }
+    }
+}
+
+impl From<window_shadows::Error> for BackendError {
+    fn from(value: window_shadows::Error) -> Self {
+        Self {
+            kind: String::from("window_shadows::Error"),
+            message: value.to_string(),
+        }
+    }
+}

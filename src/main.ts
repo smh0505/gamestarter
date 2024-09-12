@@ -1,5 +1,7 @@
 import { createApp } from "vue";
 import App from "./App.vue";
-import "./style.css"
+import File from "./File.vue";
+import "./style.css";
 
-createApp(App).mount("#app");
+if (document.querySelector("#app")) createApp(App).mount("#app");
+if (document.querySelector("#file")) createApp(File).mount("#file");

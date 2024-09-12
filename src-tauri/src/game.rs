@@ -1,3 +1,6 @@
+use std::path::Path;
+
+use chrono::Local;
 use sea_orm::*;
 
 use crate::{
@@ -6,18 +9,19 @@ use crate::{
     AppState, Response,
 };
 
-pub struct GameQuery;
+struct GameQuery;
 
 impl GameQuery {
     async fn create(db: &DbConn, form_data: game::Model) -> Result<game::ActiveModel, DbErr> {
-        game::ActiveModel {
+        let model = game::ActiveModel {
             name: Set(form_data.name.to_owned()),
             directory: Set(form_data.directory.to_owned()),
             installed: Set(form_data.installed.to_owned()),
+            playtime: Set(form_data.playtime.to_owned()),
             ..Default::default()
-        }
-        .save(db)
-        .await
+        };
+        Game::insert(model.clone()).exec(db).await?;
+        Ok(model)
     }
 
     async fn read_page(
@@ -31,13 +35,41 @@ impl GameQuery {
         let num_pages = paginator.num_pages().await?;
         paginator.fetch_page(page - 1).await.map(|p| (p, num_pages))
     }
+
+    async fn delete(db: &DbConn, id: i32) -> Result<DeleteResult, DbErr> {
+        let game: game::ActiveModel = Game::find_by_id(id)
+            .one(db)
+            .await?
+            .ok_or(DbErr::Custom(format!("Cannot find game with id {}", id)))
+            .map(Into::into)?;
+        game.delete(db).await
+    }
 }
 
 #[tauri::command]
 pub async fn add_game(
     state: tauri::State<'_, AppState>,
-    form: game::Model,
+    file: &str,
 ) -> Result<Response, BackendError> {
+    let dir = Path::new(file);
+    let form = game::Model {
+        id: 0,
+        name: dir
+            .file_stem()
+            .unwrap()
+            .to_os_string()
+            .into_string()
+            .unwrap(),
+        caption: None,
+        description: None,
+        developer: None,
+        image: None,
+        directory: dir.to_str().unwrap().to_owned(),
+        executive: None,
+        installed: Local::now().naive_local(),
+        playtime: 0,
+    };
+
     GameQuery::create(&state.conn, form).await?;
 
     Ok(Response {

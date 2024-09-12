@@ -5,6 +5,7 @@ mod entities;
 mod error;
 mod game;
 mod migration;
+mod window;
 
 use core::panic;
 use migration::Migrator;
@@ -38,7 +39,12 @@ fn main() {
             Ok(())
         })
         .manage(state)
-        .invoke_handler(tauri::generate_handler![game::add_game, game::list_games])
+        .invoke_handler(tauri::generate_handler![
+            game::add_game,
+            game::list_games,
+            window::open_file_dialog,
+            window::close_file_dialog
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
