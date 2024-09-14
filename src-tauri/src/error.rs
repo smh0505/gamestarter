@@ -35,6 +35,15 @@ impl From<tauri::Error> for BackendError {
     }
 }
 
+impl From<tauri::api::Error> for BackendError {
+    fn from(value: tauri::api::Error) -> Self {
+        Self {
+            kind: String::from("tauri::api::Error"),
+            message: value.to_string(),
+        }
+    }
+}
+
 impl From<window_shadows::Error> for BackendError {
     fn from(value: window_shadows::Error) -> Self {
         Self {

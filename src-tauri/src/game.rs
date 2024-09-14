@@ -12,7 +12,10 @@ use crate::{
 struct GameQuery;
 
 impl GameQuery {
-    async fn create(db: &DbConn, form_data: game::Model) -> Result<game::ActiveModel, DbErr> {
+    async fn create(
+        db: &DbConn,
+        form_data: game::Model,
+    ) -> Result<InsertResult<game::ActiveModel>, DbErr> {
         let model = game::ActiveModel {
             name: Set(form_data.name.to_owned()),
             directory: Set(form_data.directory.to_owned()),
@@ -20,8 +23,8 @@ impl GameQuery {
             playtime: Set(form_data.playtime.to_owned()),
             ..Default::default()
         };
-        Game::insert(model.clone()).exec(db).await?;
-        Ok(model)
+        let result = Game::insert(model.clone()).exec(db).await?;
+        Ok(result)
     }
 
     async fn read_page(
@@ -50,7 +53,7 @@ impl GameQuery {
 pub async fn add_game(
     state: tauri::State<'_, AppState>,
     file: &str,
-) -> Result<Response, BackendError> {
+) -> Result<Response<i32>, BackendError> {
     let dir = Path::new(file);
     let form = game::Model {
         id: 0,
@@ -70,11 +73,12 @@ pub async fn add_game(
         playtime: 0,
     };
 
-    GameQuery::create(&state.conn, form).await?;
+    let result = GameQuery::create(&state.conn, form).await?;
 
     Ok(Response {
         kind: "success".to_owned(),
         message: "GameQuery::Create successful".to_owned(),
+        result: Some(result.last_insert_id),
     })
 }
 

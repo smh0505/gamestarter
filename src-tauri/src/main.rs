@@ -21,9 +21,10 @@ struct AppState {
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
-struct Response {
+struct Response<T> {
     kind: String,
     message: String,
+    result: Option<T>
 }
 
 fn main() {
@@ -43,6 +44,8 @@ fn main() {
             game::add_game,
             game::list_games,
             window::open_file_dialog,
+            window::get_items,
+            window::get_parent
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
